@@ -1,12 +1,11 @@
 {
   "name": "playwright-webshot",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "scripts": {
     "build": "tsup src/index.ts --minify --dts --format cjs,esm --out-dir dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
   "files": [
     "dist",
     "package.json",
@@ -29,10 +28,15 @@
     "url": "https://github.com/Parassharmaa/playwright-webshot"
   },
   "author": "Paras Sharma",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@playwright/test": "^1.45.3"
   },
+  "keywords": [
+    "playwright",
+    "webshot",
+    "screenshot"
+  ],
   "devDependencies": {
     "tsup": "^8.2.3",
     "typescript": "^5.5.4"

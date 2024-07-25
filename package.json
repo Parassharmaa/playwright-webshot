@@ -1,6 +1,6 @@
 {
   "name": "playwright-webshot",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "",
   "scripts": {
     "build": "tsup src/index.ts --minify --dts --format cjs,esm --out-dir dist",
@@ -9,7 +9,10 @@
   "keywords": [],
   "files": [
     "dist",
-    "package.json"
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "test/screenshot.png"
   ],
   "exports": {
     ".": {
@@ -21,10 +24,16 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Parassharmaa/playwright-webshot"
+  },
+  "author": "Paras Sharma",
   "license": "ISC",
+  "dependencies": {
+    "@playwright/test": "^1.45.3"
+  },
   "devDependencies": {
-    "@playwright/test": "^1.45.3",
     "tsup": "^8.2.3",
     "typescript": "^5.5.4"
   }

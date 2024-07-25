@@ -35,7 +35,51 @@ test("Paint Webshot", async ({ page }) => {
             color: "red",
           },
         },
-     },
+      },
+      {
+        locator,
+        type: "arrow",
+        arrow: {
+          direction: "down",
+          color: "green",
+          width: 50,
+          height: 2,
+          offset: 30,
+        },
+      },
+      {
+        locator,
+        type: "arrow",
+        arrow: {
+          direction: "right",
+          color: "red",
+          width: 50,
+          height: 2,
+          offset: 30,
+        },
+      },
+      {
+        locator,
+        type: "arrow",
+        arrow: {
+          direction: "left",
+          color: "red",
+          width: 50,
+          height: 2,
+          offset: 30,
+        },
+      },
+      {
+        locator,
+        type: "arrow",
+        arrow: {
+          direction: "up",
+          color: "red",
+          width: 50,
+          height: 2,
+          offset: 30,
+        },
+      },
       {
         locator: page
           .getByText(

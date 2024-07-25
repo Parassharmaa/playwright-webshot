@@ -1,6 +1,8 @@
 # Webshot
 Add bounding boxes, arrows, masks and text to screenshots of webpages.
 
+![](./test/screenshot.png)
+
 ## Installation
 ```bash
 npm i playwright-webshot

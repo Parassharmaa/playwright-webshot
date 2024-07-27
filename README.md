@@ -2,9 +2,7 @@
 
 Add bounding boxes, arrows, masks and text to screenshots of webpages.
 
-![npm](https://img.shields.io/npm/v/playwright-webshot.svg)
-
-
+[![npm](https://img.shields.io/npm/v/playwright-webshot.svg)](https://www.npmjs.com/package/playwright-webshot)
 
 
 ![](./test/screenshot.png)

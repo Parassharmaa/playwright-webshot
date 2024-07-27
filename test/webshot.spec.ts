@@ -27,6 +27,10 @@ test("Paint Webshot", async ({ page }) => {
           width: 50,
           height: 2,
           offset: 30,
+          text: "This is Down Arrow",
+          fontSize: 22,
+          textColor: "white",
+          textBgColor: "rgba(255,0,255,0.5)",
         },
       },
       {
@@ -38,10 +42,14 @@ test("Paint Webshot", async ({ page }) => {
           width: 50,
           height: 2,
           offset: 30,
+          text: "This is <br/> Right Arrow",
+          fontSize: 18,
+          textColor: "white",
+          textBgColor: "blue",
         },
       },
       {
-        locator,
+        locator: page.getByText(/Community/i).first(),
         type: "arrow",
         arrow: {
           direction: "left",
@@ -49,6 +57,10 @@ test("Paint Webshot", async ({ page }) => {
           width: 50,
           height: 2,
           offset: 30,
+          text: "This is <br/> Left Arrow",
+          fontSize: 22,
+          textColor: "rgba(0,0,10,0.5)",
+          textBgColor: "rgba(0,255,10,0.9)",
         },
       },
       {
@@ -60,6 +72,9 @@ test("Paint Webshot", async ({ page }) => {
           width: 50,
           height: 2,
           offset: 30,
+          text: "This is Up Arrow",
+          fontSize: 22,
+          textColor: "white",
         },
       },
       {
@@ -74,6 +89,19 @@ test("Paint Webshot", async ({ page }) => {
           blur: 10,
         },
       },
+      {
+        locator,
+        type: "text",
+        text: {
+          content: "Hello World, <br/> This is a subtitle.",
+          color: "white",
+          fontSize: 34,
+          backgroundColor: "rgba(255,0,255,0.5)",
+          bottom: "2px",
+          left: "30%",
+          right: "30%",
+        },
+      },
     ],
     {
       path: "test/screenshot.png",
@@ -81,6 +109,10 @@ test("Paint Webshot", async ({ page }) => {
   );
 
   expect(screenshot).toMatchSnapshot();
+
+  expect(await page.content()).toMatchSnapshot({
+    name: "content.html",
+  });
 
   await page.close();
 });

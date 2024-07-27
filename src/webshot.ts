@@ -6,7 +6,7 @@ import {
 
 interface PaintConfig {
   locator: Locator;
-  type: "box" | "arrow" | "mask";
+  type: "box" | "arrow" | "mask" | "text";
   mask?: {
     color: string;
     blur: number;
@@ -24,6 +24,20 @@ interface PaintConfig {
     width?: number;
     height?: number;
     offset?: number;
+    text?: string;
+    textColor?: string;
+    fontSize?: number;
+    textBgColor?: string;
+  };
+  text?: {
+    content: string;
+    color: string;
+    fontSize?: number;
+    backgroundColor?: string;
+    top?: string;
+    left?: string;
+    bottom?: string;
+    right?: string;
   };
 }
 
@@ -146,6 +160,65 @@ export const webshot = async (
 
             // insert arrow element to the body
             document.body.appendChild(arrowElement);
+
+            // add text at the end of the arrow
+            if (arrow.text) {
+              // calculate text position using getBoundingClientRect of arrow
+              const textElement = document.createElement("div");
+              const arrowRect = arrowElement.getBoundingClientRect();
+
+              textElement.style.position = "absolute";
+
+              document.body.appendChild(textElement);
+
+              textElement.innerHTML = arrow.text;
+
+              textElement.style.color = arrow.textColor || "black";
+
+              textElement.style.zIndex = "99999";
+
+              textElement.style.fontSize = `${arrow.fontSize}px`;
+
+              textElement.style.background = arrow.textBgColor || "transparent";
+
+              textElement.style.padding = "2px";
+
+              textElement.style.lineHeight = "1";
+
+              const textRect = textElement.getBoundingClientRect();
+
+              switch (arrow.direction) {
+                case "left":
+                  textElement.style.left = `${
+                    arrowRect.left - textRect.width
+                  }px`;
+                  textElement.style.top = `${
+                    arrowRect.top - textRect.height / 2
+                  }px`;
+                  break;
+                case "right":
+                  textElement.style.left = `${arrowRect.right}px`;
+                  textElement.style.top = `${
+                    arrowRect.top - textRect.height / 2
+                  }px`;
+                  break;
+                case "up":
+                  textElement.style.left = `${
+                    arrowRect.left - textRect.width / 2
+                  }px`;
+                  textElement.style.top = `${
+                    arrowRect.top - textRect.height
+                  }px`;
+                  break;
+
+                case "down":
+                  textElement.style.left = `${
+                    arrowRect.left - textRect.width / 2
+                  }px`;
+                  textElement.style.top = `${arrowRect.bottom}px`;
+                  break;
+              }
+            }
           },
           { arrow, className }
         );
@@ -169,6 +242,34 @@ export const webshot = async (
           element.style.position = "relative";
           element.appendChild(maskElement);
         }, paintConfig.mask);
+      }
+
+      if (paintConfig.type === "text") {
+        if (!paintConfig.text) {
+          throw new Error("Text config is required");
+        }
+        await locator.evaluate((element, text) => {
+          const textElement = document.createElement("div");
+          textElement.style.position = "fixed";
+          textElement.style.top = text.top || "none";
+          textElement.style.left = text.left || "none";
+          textElement.style.right = text.right || "none";
+          textElement.style.bottom = text.bottom || "none";
+
+          textElement.style.zIndex = "9999";
+          textElement.style.color = text.color || "black";
+          textElement.style.fontSize = `${text.fontSize}px`;
+          textElement.style.background = text.backgroundColor || "transparent";
+          textElement.style.padding = "2px";
+          textElement.style.lineHeight = "1";
+
+          textElement.style.textAlign = "center";
+
+          textElement.innerHTML = text.content;
+
+          // append text element to the body
+          document.body.appendChild(textElement);
+        }, paintConfig.text);
       }
     })
   );

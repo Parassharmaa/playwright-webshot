@@ -16,6 +16,8 @@ test("Paint Webshot", async ({ page }) => {
             width: 2,
             color: "red",
           },
+          padding: 8,
+          radius: 2,
         },
       },
       {
@@ -26,7 +28,7 @@ test("Paint Webshot", async ({ page }) => {
           color: "green",
           width: 50,
           height: 2,
-          offset: 30,
+          offset: 50,
           text: "This is Down Arrow",
           fontSize: 22,
           textColor: "white",
@@ -100,6 +102,18 @@ test("Paint Webshot", async ({ page }) => {
           bottom: "2px",
           left: "30%",
           right: "30%",
+        },
+      },
+      {
+        locator: page.getByText(/Community/i).first(),
+        type: "box",
+        box: {
+          border: {
+            width: 2,
+            color: "red",
+          },
+          padding: 8,
+          radius: 2,
         },
       },
     ],

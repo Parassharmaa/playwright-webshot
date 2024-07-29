@@ -4,7 +4,7 @@ import {
   type Page,
 } from "@playwright/test";
 
-interface PaintConfig {
+export interface PaintConfig {
   locator: Locator;
   type: "box" | "arrow" | "mask" | "text";
   mask?: {
@@ -16,7 +16,9 @@ interface PaintConfig {
       width: number;
       color: string;
     };
+    radius?: number;
     background?: string;
+    padding?: number;
   };
   arrow?: {
     direction: "left" | "right" | "up" | "down";
@@ -78,15 +80,34 @@ export const webshot = async (
       }
       const { box, arrow } = paintConfig;
 
-      if (box) {
+      if (paintConfig.type === "box") {
         await locator.evaluate((element, box) => {
-          if (box.border) {
-            element.style.border = `${box.border.width}px solid ${box.border.color}`;
-          }
+          const elemRect = element.getBoundingClientRect();
+          const boxElement = document.createElement("div");
 
-          if (box.background) {
-            element.style.background = box.background;
-          }
+          const padding = box?.padding || 0;
+
+          boxElement.style.position = "absolute";
+          boxElement.style.top = `${-padding}px`;
+          boxElement.style.left = `${-padding}px`;
+
+          boxElement.style.bottom = "auto";
+          boxElement.style.right = "auto";
+          boxElement.style.width = `${elemRect.width + 2 * padding}px`;
+          boxElement.style.height = `${elemRect.height + 2 * padding}px`;
+
+          boxElement.style.zIndex = "9999";
+
+          boxElement.style.borderColor = box?.border?.color || "transparent";
+          boxElement.style.borderWidth = `${box?.border?.width || 0}px`;
+          boxElement.style.borderStyle = "solid";
+
+          boxElement.style.borderRadius = `${box?.radius || 0}px`;
+
+          boxElement.style.background = box?.background || "transparent";
+
+          element.style.position = "relative";
+          element.appendChild(boxElement);
         }, box);
       }
 
@@ -108,7 +129,6 @@ export const webshot = async (
             arrowElement.style.width = `${arrow.width || 100}px`;
             arrowElement.style.height = `${arrow.height || 10}px`;
 
-            // add zIndex to make sure it's on top
             arrowElement.style.zIndex = "9999";
 
             arrowElement.style.position = "fixed";

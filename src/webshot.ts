@@ -111,7 +111,7 @@ export const webshot = async (
             // add zIndex to make sure it's on top
             arrowElement.style.zIndex = "9999";
 
-            arrowElement.style.position = "absolute";
+            arrowElement.style.position = "fixed";
 
             const targetRect = element.getBoundingClientRect();
             const arrowWidth = arrow.width || 100;
@@ -167,7 +167,7 @@ export const webshot = async (
               const textElement = document.createElement("div");
               const arrowRect = arrowElement.getBoundingClientRect();
 
-              textElement.style.position = "absolute";
+              textElement.style.position = "fixed";
 
               document.body.appendChild(textElement);
 

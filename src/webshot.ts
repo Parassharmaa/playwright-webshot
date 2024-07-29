@@ -3,6 +3,8 @@ import {
   type Locator,
   type Page,
 } from "@playwright/test";
+import { readFileSync } from "fs";
+import { URL } from "url";
 
 export interface BoxConfig {
   border?: {
@@ -72,11 +74,43 @@ const addArrowCss = (color: string) => {
   return { className, css };
 };
 
+// extend type
+export interface WebshotOptions extends PageScreenshotOptions {
+  showBrowserFrame?: boolean;
+  darkMode?: boolean;
+}
+
 export const webshot = async (
   page: Page,
   configs: PaintConfig[],
-  options?: PageScreenshotOptions
+  options?: WebshotOptions
 ) => {
+  if (options?.showBrowserFrame) {
+    // load browser tab svg
+    let tabSvg = readFileSync(
+      `./src/frames/frame-mac-${options.darkMode ? "dark" : "light"}.svg`,
+      "utf8"
+    );
+
+    tabSvg = tabSvg.replace("{{url}}", new URL(page.url()).host);
+    await page.evaluate(
+      ({ tabSvg }) => {
+        const tabElement = document.createElement("div");
+        tabElement.innerHTML = tabSvg;
+
+        tabElement.style.position = "fixed";
+        tabElement.style.top = "0";
+        tabElement.style.left = "0";
+        tabElement.style.zIndex = "9999";
+
+        document.body.style.marginTop = "50px";
+
+        document.body.appendChild(tabElement);
+      },
+      { tabSvg }
+    );
+  }
+
   await Promise.all(
     configs.map(async (paintConfig) => {
       const { locator } = paintConfig;
@@ -301,5 +335,8 @@ export const webshot = async (
     })
   );
 
-  return page.screenshot({ type: "png", ...options });
+  return page.screenshot({
+    type: "png",
+    ...options,
+  });
 };

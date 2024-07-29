@@ -1,6 +1,6 @@
 {
   "name": "playwright-webshot",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "",
   "scripts": {
     "build": "tsup src/index.ts --minify --dts --format cjs,esm --out-dir dist",
@@ -30,7 +30,8 @@
   "author": "Paras Sharma",
   "license": "MIT",
   "dependencies": {
-    "@playwright/test": "^1.45.3"
+    "@playwright/test": "^1.45.3",
+    "@types/node": "^22.0.0"
   },
   "keywords": [
     "playwright",

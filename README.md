@@ -27,7 +27,7 @@ test("Paint Webshot", async ({ page }) => {
 
   const locator = page.getByText(/get started/i).first();
 
-  const screenshot = await webshot(
+const screenshot = await webshot(
     page,
     [
       {
@@ -38,6 +38,8 @@ test("Paint Webshot", async ({ page }) => {
             width: 2,
             color: "red",
           },
+          padding: 8,
+          radius: 2,
         },
       },
       {
@@ -48,7 +50,11 @@ test("Paint Webshot", async ({ page }) => {
           color: "green",
           width: 50,
           height: 2,
-          offset: 30,
+          offset: 50,
+          text: "This is Down Arrow",
+          fontSize: 22,
+          textColor: "white",
+          textBgColor: "rgba(255,0,255,0.5)",
         },
       },
       {
@@ -60,10 +66,14 @@ test("Paint Webshot", async ({ page }) => {
           width: 50,
           height: 2,
           offset: 30,
+          text: "This is <br/> Right Arrow",
+          fontSize: 18,
+          textColor: "white",
+          textBgColor: "blue",
         },
       },
       {
-        locator,
+        locator: page.getByText(/Community/i).first(),
         type: "arrow",
         arrow: {
           direction: "left",
@@ -71,6 +81,10 @@ test("Paint Webshot", async ({ page }) => {
           width: 50,
           height: 2,
           offset: 30,
+          text: "This is <br/> Left Arrow",
+          fontSize: 22,
+          textColor: "rgba(0,0,10,0.5)",
+          textBgColor: "rgba(0,255,10,0.9)",
         },
       },
       {
@@ -82,6 +96,9 @@ test("Paint Webshot", async ({ page }) => {
           width: 50,
           height: 2,
           offset: 30,
+          text: "This is Up Arrow",
+          fontSize: 22,
+          textColor: "white",
         },
       },
       {
@@ -96,9 +113,36 @@ test("Paint Webshot", async ({ page }) => {
           blur: 10,
         },
       },
+      {
+        locator,
+        type: "text",
+        text: {
+          content: "Hello World, <br/> This is a subtitle.",
+          color: "white",
+          fontSize: 34,
+          backgroundColor: "rgba(255,0,255,0.5)",
+          bottom: "2px",
+          left: "30%",
+          right: "30%",
+        },
+      },
+      {
+        locator: page.getByText(/Community/i).first(),
+        type: "box",
+        box: {
+          border: {
+            width: 2,
+            color: "red",
+          },
+          padding: 8,
+          radius: 2,
+        },
+      },
     ],
     {
       path: "test/screenshot.png",
+      showBrowserFrame: true,
+      darkMode: false,
     }
   );
   

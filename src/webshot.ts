@@ -4,43 +4,50 @@ import {
   type Page,
 } from "@playwright/test";
 
+export interface BoxConfig {
+  border?: {
+    width: number;
+    color: string;
+  };
+  radius?: number;
+  background?: string;
+  padding?: number;
+}
+export interface ArrowConfig {
+  direction: "left" | "right" | "up" | "down";
+  color: string;
+  width?: number;
+  height?: number;
+  offset?: number;
+  text?: string;
+  textColor?: string;
+  fontSize?: number;
+  textBgColor?: string;
+}
+
+export interface TextConfig {
+  content: string;
+  color: string;
+  fontSize?: number;
+  backgroundColor?: string;
+  top?: string;
+  left?: string;
+  bottom?: string;
+  right?: string;
+}
+
+export interface MaskConfig {
+  color: string;
+  blur: number;
+}
+
 export interface PaintConfig {
   locator: Locator;
-  type: "box" | "arrow" | "mask" | "text";
-  mask?: {
-    color: string;
-    blur: number;
-  };
-  box?: {
-    border?: {
-      width: number;
-      color: string;
-    };
-    radius?: number;
-    background?: string;
-    padding?: number;
-  };
-  arrow?: {
-    direction: "left" | "right" | "up" | "down";
-    color: string;
-    width?: number;
-    height?: number;
-    offset?: number;
-    text?: string;
-    textColor?: string;
-    fontSize?: number;
-    textBgColor?: string;
-  };
-  text?: {
-    content: string;
-    color: string;
-    fontSize?: number;
-    backgroundColor?: string;
-    top?: string;
-    left?: string;
-    bottom?: string;
-    right?: string;
-  };
+  type: "box" | "arrow" | "mask" | "text" | string;
+  mask?: MaskConfig;
+  box?: BoxConfig;
+  arrow?: ArrowConfig;
+  text?: TextConfig;
 }
 
 const addArrowCss = (color: string) => {

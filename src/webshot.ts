@@ -3,8 +3,9 @@ import {
   type Locator,
   type Page,
 } from "@playwright/test";
-import { readFileSync } from "fs";
 import { URL } from "url";
+import frameMacDark from "./frames/frameMacDark";
+import frameMacLight from "./frames/frameMacLight";
 
 export interface BoxConfig {
   border?: {
@@ -74,7 +75,6 @@ const addArrowCss = (color: string) => {
   return { className, css };
 };
 
-// extend type
 export interface WebshotOptions extends PageScreenshotOptions {
   showBrowserFrame?: boolean;
   darkMode?: boolean;
@@ -86,25 +86,18 @@ export const webshot = async (
   options?: WebshotOptions
 ) => {
   if (options?.showBrowserFrame) {
-    // load browser tab svg
-    let tabSvg = readFileSync(
-      `./src/frames/frame-mac-${options.darkMode ? "dark" : "light"}.svg`,
-      "utf8"
-    );
+    const host = new URL(page.url()).host;
+    const tabSvg = options.darkMode ? frameMacDark(host) : frameMacLight(host);
 
-    tabSvg = tabSvg.replace("{{url}}", new URL(page.url()).host);
     await page.evaluate(
       ({ tabSvg }) => {
         const tabElement = document.createElement("div");
         tabElement.innerHTML = tabSvg;
-
         tabElement.style.position = "fixed";
         tabElement.style.top = "0";
         tabElement.style.left = "0";
         tabElement.style.zIndex = "9999";
-
         document.body.style.marginTop = "50px";
-
         document.body.appendChild(tabElement);
       },
       { tabSvg }

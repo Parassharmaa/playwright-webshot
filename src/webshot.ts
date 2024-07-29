@@ -85,29 +85,6 @@ export const webshot = async (
   configs: PaintConfig[],
   options?: WebshotOptions
 ) => {
-  const topOffset = options?.showBrowserFrame ? -50 : 0;
-
-  if (options?.showBrowserFrame) {
-    const host = new URL(page.url()).host;
-    const tabSvg = options.darkMode ? frameMacDark(host) : frameMacLight(host);
-
-    await page.evaluate(
-      ({ tabSvg, topOffset }) => {
-        document.documentElement.style.transform = `translate(0px, ${-topOffset}px)`;
-        document.documentElement.style.overflow = "hidden";
-        const tabElement = document.createElement("div");
-        tabElement.innerHTML = tabSvg;
-        tabElement.style.position = "fixed";
-        tabElement.style.top = `${topOffset}px`;
-        tabElement.style.left = "0";
-        tabElement.style.zIndex = "9999";
-
-        document.body.appendChild(tabElement);
-      },
-      { tabSvg, topOffset }
-    );
-  }
-
   await Promise.all(
     configs.map(async (paintConfig) => {
       const { locator } = paintConfig;
@@ -120,7 +97,7 @@ export const webshot = async (
 
       if (paintConfig.type === "box") {
         await locator.evaluate(
-          (element, { box, topOffset }) => {
+          (element, { box }) => {
             const elemRect = element.getBoundingClientRect();
             const boxElement = document.createElement("div");
 
@@ -148,7 +125,7 @@ export const webshot = async (
             element.style.position = "relative";
             element.appendChild(boxElement);
           },
-          { box, topOffset }
+          { box }
         );
       }
 
@@ -161,7 +138,7 @@ export const webshot = async (
           content: css,
         });
         await locator.evaluate(
-          (element, { arrow, className, topOffset }) => {
+          (element, { arrow, className }) => {
             const arrowElement = document.createElement("div");
 
             arrowElement.classList.add(className);
@@ -185,19 +162,13 @@ export const webshot = async (
                   targetRect.left - arrowWidth - arrowOffset
                 }px`;
                 arrowElement.style.top = `${
-                  targetRect.top +
-                  targetRect.height / 2 -
-                  arrowHeight / 2 +
-                  topOffset
+                  targetRect.top + targetRect.height / 2 - arrowHeight / 2
                 }px`;
                 break;
               case "right":
                 arrowElement.style.left = `${targetRect.right + arrowOffset}px`;
                 arrowElement.style.top = `${
-                  targetRect.top +
-                  targetRect.height / 2 -
-                  arrowHeight / 2 +
-                  topOffset
+                  targetRect.top + targetRect.height / 2 - arrowHeight / 2
                 }px`;
                 // flip the arrow
                 arrowElement.style.transform = "rotate(180deg)";
@@ -207,7 +178,7 @@ export const webshot = async (
                   targetRect.left + targetRect.width / 2 - arrowWidth / 2
                 }px`;
                 arrowElement.style.top = `${
-                  targetRect.top - arrowOffset - arrowWidth / 2 + topOffset
+                  targetRect.top - arrowOffset - arrowWidth / 2
                 }px`;
 
                 arrowElement.style.transform = "rotate(90deg)";
@@ -218,7 +189,7 @@ export const webshot = async (
                   targetRect.left + targetRect.width / 2 - arrowWidth / 2
                 }px`;
                 arrowElement.style.top = `${
-                  targetRect.bottom + arrowWidth / 2 + arrowOffset + topOffset
+                  targetRect.bottom + arrowWidth / 2 + arrowOffset
                 }px`;
                 arrowElement.style.transform = "rotate(270deg)";
 
@@ -260,13 +231,13 @@ export const webshot = async (
                     arrowRect.left - textRect.width
                   }px`;
                   textElement.style.top = `${
-                    arrowRect.top - textRect.height / 2 + topOffset
+                    arrowRect.top - textRect.height / 2
                   }px`;
                   break;
                 case "right":
                   textElement.style.left = `${arrowRect.right}px`;
                   textElement.style.top = `${
-                    arrowRect.top - textRect.height / 2 + topOffset
+                    arrowRect.top - textRect.height / 2
                   }px`;
                   break;
                 case "up":
@@ -274,7 +245,7 @@ export const webshot = async (
                     arrowRect.left - textRect.width / 2
                   }px`;
                   textElement.style.top = `${
-                    arrowRect.top - textRect.height + topOffset
+                    arrowRect.top - textRect.height
                   }px`;
                   break;
 
@@ -282,12 +253,12 @@ export const webshot = async (
                   textElement.style.left = `${
                     arrowRect.left - textRect.width / 2
                   }px`;
-                  textElement.style.top = `${arrowRect.bottom + topOffset}px`;
+                  textElement.style.top = `${arrowRect.bottom}px`;
                   break;
               }
             }
           },
-          { arrow, className, topOffset }
+          { arrow, className }
         );
       }
 
@@ -319,17 +290,13 @@ export const webshot = async (
           throw new Error("Text config is required");
         }
         await locator.evaluate(
-          (element, { text, topOffset }) => {
+          (element, { text }) => {
             const textElement = document.createElement("div");
             textElement.style.position = "fixed";
-            textElement.style.top = text.top
-              ? parseFloat(text.top || "0") + topOffset + "px"
-              : "none";
+            textElement.style.top = text.top || "none";
             textElement.style.left = text.left || "none";
             textElement.style.right = text.right || "none";
-            textElement.style.bottom = text.bottom
-              ? parseFloat(text.bottom) - topOffset + "px"
-              : "none";
+            textElement.style.bottom = text.bottom || "none";
 
             textElement.style.zIndex = "9999";
             textElement.style.color = text.color || "black";
@@ -346,7 +313,7 @@ export const webshot = async (
             // append text element to the body
             document.body.appendChild(textElement);
           },
-          { text: paintConfig.text, topOffset }
+          { text: paintConfig.text }
         );
       }
     })

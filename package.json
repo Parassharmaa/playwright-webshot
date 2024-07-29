@@ -1,6 +1,6 @@
 {
   "name": "playwright-webshot",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "",
   "scripts": {
     "build": "tsup src/index.ts --minify --dts --format cjs,esm --out-dir dist",

@@ -85,22 +85,26 @@ export const webshot = async (
   configs: PaintConfig[],
   options?: WebshotOptions
 ) => {
+  const topOffset = options?.showBrowserFrame ? -50 : 0;
+
   if (options?.showBrowserFrame) {
     const host = new URL(page.url()).host;
     const tabSvg = options.darkMode ? frameMacDark(host) : frameMacLight(host);
 
     await page.evaluate(
-      ({ tabSvg }) => {
+      ({ tabSvg, topOffset }) => {
+        document.documentElement.style.transform = `translate(0px, ${-topOffset}px)`;
+        document.documentElement.style.overflow = "hidden";
         const tabElement = document.createElement("div");
         tabElement.innerHTML = tabSvg;
         tabElement.style.position = "fixed";
-        tabElement.style.top = "0";
+        tabElement.style.top = `${topOffset}px`;
         tabElement.style.left = "0";
         tabElement.style.zIndex = "9999";
-        document.body.style.marginTop = "50px";
+
         document.body.appendChild(tabElement);
       },
-      { tabSvg }
+      { tabSvg, topOffset }
     );
   }
 
@@ -115,34 +119,37 @@ export const webshot = async (
       const { box, arrow } = paintConfig;
 
       if (paintConfig.type === "box") {
-        await locator.evaluate((element, box) => {
-          const elemRect = element.getBoundingClientRect();
-          const boxElement = document.createElement("div");
+        await locator.evaluate(
+          (element, { box, topOffset }) => {
+            const elemRect = element.getBoundingClientRect();
+            const boxElement = document.createElement("div");
 
-          const padding = box?.padding || 0;
+            const padding = box?.padding || 0;
 
-          boxElement.style.position = "absolute";
-          boxElement.style.top = `${-padding}px`;
-          boxElement.style.left = `${-padding}px`;
+            boxElement.style.position = "absolute";
+            boxElement.style.top = `${-padding}px`;
+            boxElement.style.left = `${-padding}px`;
 
-          boxElement.style.bottom = "auto";
-          boxElement.style.right = "auto";
-          boxElement.style.width = `${elemRect.width + 2 * padding}px`;
-          boxElement.style.height = `${elemRect.height + 2 * padding}px`;
+            boxElement.style.bottom = "auto";
+            boxElement.style.right = "auto";
+            boxElement.style.width = `${elemRect.width + 2 * padding}px`;
+            boxElement.style.height = `${elemRect.height + 2 * padding}px`;
 
-          boxElement.style.zIndex = "9999";
+            boxElement.style.zIndex = "9999";
 
-          boxElement.style.borderColor = box?.border?.color || "transparent";
-          boxElement.style.borderWidth = `${box?.border?.width || 0}px`;
-          boxElement.style.borderStyle = "solid";
+            boxElement.style.borderColor = box?.border?.color || "transparent";
+            boxElement.style.borderWidth = `${box?.border?.width || 0}px`;
+            boxElement.style.borderStyle = "solid";
 
-          boxElement.style.borderRadius = `${box?.radius || 0}px`;
+            boxElement.style.borderRadius = `${box?.radius || 0}px`;
 
-          boxElement.style.background = box?.background || "transparent";
+            boxElement.style.background = box?.background || "transparent";
 
-          element.style.position = "relative";
-          element.appendChild(boxElement);
-        }, box);
+            element.style.position = "relative";
+            element.appendChild(boxElement);
+          },
+          { box, topOffset }
+        );
       }
 
       if (arrow) {
@@ -154,7 +161,7 @@ export const webshot = async (
           content: css,
         });
         await locator.evaluate(
-          (element, { arrow, className }) => {
+          (element, { arrow, className, topOffset }) => {
             const arrowElement = document.createElement("div");
 
             arrowElement.classList.add(className);
@@ -178,13 +185,19 @@ export const webshot = async (
                   targetRect.left - arrowWidth - arrowOffset
                 }px`;
                 arrowElement.style.top = `${
-                  targetRect.top + targetRect.height / 2 - arrowHeight / 2
+                  targetRect.top +
+                  targetRect.height / 2 -
+                  arrowHeight / 2 +
+                  topOffset
                 }px`;
                 break;
               case "right":
                 arrowElement.style.left = `${targetRect.right + arrowOffset}px`;
                 arrowElement.style.top = `${
-                  targetRect.top + targetRect.height / 2 - arrowHeight / 2
+                  targetRect.top +
+                  targetRect.height / 2 -
+                  arrowHeight / 2 +
+                  topOffset
                 }px`;
                 // flip the arrow
                 arrowElement.style.transform = "rotate(180deg)";
@@ -194,7 +207,7 @@ export const webshot = async (
                   targetRect.left + targetRect.width / 2 - arrowWidth / 2
                 }px`;
                 arrowElement.style.top = `${
-                  targetRect.top - arrowOffset - arrowWidth / 2
+                  targetRect.top - arrowOffset - arrowWidth / 2 + topOffset
                 }px`;
 
                 arrowElement.style.transform = "rotate(90deg)";
@@ -205,7 +218,7 @@ export const webshot = async (
                   targetRect.left + targetRect.width / 2 - arrowWidth / 2
                 }px`;
                 arrowElement.style.top = `${
-                  targetRect.bottom + arrowWidth / 2 + arrowOffset
+                  targetRect.bottom + arrowWidth / 2 + arrowOffset + topOffset
                 }px`;
                 arrowElement.style.transform = "rotate(270deg)";
 
@@ -247,13 +260,13 @@ export const webshot = async (
                     arrowRect.left - textRect.width
                   }px`;
                   textElement.style.top = `${
-                    arrowRect.top - textRect.height / 2
+                    arrowRect.top - textRect.height / 2 + topOffset
                   }px`;
                   break;
                 case "right":
                   textElement.style.left = `${arrowRect.right}px`;
                   textElement.style.top = `${
-                    arrowRect.top - textRect.height / 2
+                    arrowRect.top - textRect.height / 2 + topOffset
                   }px`;
                   break;
                 case "up":
@@ -261,7 +274,7 @@ export const webshot = async (
                     arrowRect.left - textRect.width / 2
                   }px`;
                   textElement.style.top = `${
-                    arrowRect.top - textRect.height
+                    arrowRect.top - textRect.height + topOffset
                   }px`;
                   break;
 
@@ -269,12 +282,12 @@ export const webshot = async (
                   textElement.style.left = `${
                     arrowRect.left - textRect.width / 2
                   }px`;
-                  textElement.style.top = `${arrowRect.bottom}px`;
+                  textElement.style.top = `${arrowRect.bottom + topOffset}px`;
                   break;
               }
             }
           },
-          { arrow, className }
+          { arrow, className, topOffset }
         );
       }
 
@@ -282,48 +295,59 @@ export const webshot = async (
         if (!paintConfig.mask) {
           throw new Error("Mask config is required");
         }
-        await locator.evaluate((element, mask) => {
-          const maskElement = document.createElement("div");
-          maskElement.style.position = "absolute";
-          maskElement.style.top = "0";
-          maskElement.style.left = "0";
-          maskElement.style.width = "100%";
-          maskElement.style.height = "100%";
-          maskElement.style.zIndex = "9999";
-          maskElement.style.backgroundColor = mask.color;
-          maskElement.style.backdropFilter = `blur(${mask.blur || 0}px)`;
+        await locator.evaluate(
+          (element, { mask }) => {
+            const maskElement = document.createElement("div");
+            maskElement.style.position = "absolute";
+            maskElement.style.top = "0";
+            maskElement.style.left = "0";
+            maskElement.style.width = "100%";
+            maskElement.style.height = "100%";
+            maskElement.style.zIndex = "9999";
+            maskElement.style.backgroundColor = mask.color;
+            maskElement.style.backdropFilter = `blur(${mask.blur || 0}px)`;
 
-          element.style.position = "relative";
-          element.appendChild(maskElement);
-        }, paintConfig.mask);
+            element.style.position = "relative";
+            element.appendChild(maskElement);
+          },
+          { mask: paintConfig.mask }
+        );
       }
 
       if (paintConfig.type === "text") {
         if (!paintConfig.text) {
           throw new Error("Text config is required");
         }
-        await locator.evaluate((element, text) => {
-          const textElement = document.createElement("div");
-          textElement.style.position = "fixed";
-          textElement.style.top = text.top || "none";
-          textElement.style.left = text.left || "none";
-          textElement.style.right = text.right || "none";
-          textElement.style.bottom = text.bottom || "none";
+        await locator.evaluate(
+          (element, { text, topOffset }) => {
+            const textElement = document.createElement("div");
+            textElement.style.position = "fixed";
+            textElement.style.top = text.top
+              ? parseFloat(text.top || "0") + topOffset + "px"
+              : "none";
+            textElement.style.left = text.left || "none";
+            textElement.style.right = text.right || "none";
+            textElement.style.bottom = text.bottom
+              ? parseFloat(text.bottom) - topOffset + "px"
+              : "none";
 
-          textElement.style.zIndex = "9999";
-          textElement.style.color = text.color || "black";
-          textElement.style.fontSize = `${text.fontSize}px`;
-          textElement.style.background = text.backgroundColor || "transparent";
-          textElement.style.padding = "2px";
-          textElement.style.lineHeight = "1";
+            textElement.style.zIndex = "9999";
+            textElement.style.color = text.color || "black";
+            textElement.style.fontSize = `${text.fontSize}px`;
+            textElement.style.background =
+              text.backgroundColor || "transparent";
+            textElement.style.padding = "2px";
+            textElement.style.lineHeight = "1";
 
-          textElement.style.textAlign = "center";
+            textElement.style.textAlign = "center";
 
-          textElement.innerHTML = text.content;
+            textElement.innerHTML = text.content;
 
-          // append text element to the body
-          document.body.appendChild(textElement);
-        }, paintConfig.text);
+            // append text element to the body
+            document.body.appendChild(textElement);
+          },
+          { text: paintConfig.text, topOffset }
+        );
       }
     })
   );

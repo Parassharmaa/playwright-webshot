@@ -1,6 +1,6 @@
-# Webshot
+# Playwright Webshot
 
-Add bounding boxes, arrows, masks and text to screenshots of webpages.
+Easily enhance your webpage screenshots with bounding boxes, arrows, blur masks, text annotations, and browser mockup frames. Keep your documentation visuals up to date effortlessly, reducing the effort required to maintain your screenshots as the UI updates.
 
 [![npm](https://img.shields.io/npm/v/playwright-webshot.svg)](https://www.npmjs.com/package/playwright-webshot)
 

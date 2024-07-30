@@ -1,4 +1,4 @@
-export default (url = "www.google.com") =>
+export default (url = "www.google.com", title = "") =>
   `<svg width="1280" height="53" viewBox="0 0 1280 53" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g filter="url(#filter0_i_1196_920)">
 <path d="M0 10C0 4.47715 4.47715 0 10 0H1270C1275.52 0 1280 4.47715 1280 10V53H0V10Z" fill="white"/>

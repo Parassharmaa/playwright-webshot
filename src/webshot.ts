@@ -3,11 +3,9 @@ import {
   type Locator,
   type Page,
   chromium,
-  expect,
 } from "@playwright/test";
 import { URL } from "url";
-import frameMacDark from "./frames/frameMacDark";
-import frameMacLight from "./frames/frameMacLight";
+import { getBrowserFrameConfig } from "./frames";
 
 export interface BoxConfig {
   border?: {
@@ -80,6 +78,7 @@ const addArrowCss = (color: string) => {
 export interface WebshotOptions extends PageScreenshotOptions {
   showBrowserFrame?: boolean;
   darkMode?: boolean;
+  browserFrameType?: "mac" | "chrome";
 }
 
 export const webshot = async (
@@ -332,13 +331,25 @@ export const webshot = async (
 
     const hostname = new URL(page.url()).hostname;
 
+    let title = await page.title();
+
+    if (title.length > 25) {
+      title = title.substring(0, 25) + "...";
+    }
+
     const context = await browser.newContext();
 
     const newPage = await context.newPage();
 
     const originalHeight = page.viewportSize()?.height || 720;
     const originalWidth = page.viewportSize()?.width || 1280;
-    const frameOffset = 53;
+
+    const browserFrameSvg = getBrowserFrameConfig(
+      options.browserFrameType || "mac",
+      options.darkMode || false
+    );
+    const frameOffset = browserFrameSvg.offset;
+
     await newPage.setViewportSize({
       width: originalWidth,
       height: originalHeight + frameOffset,
@@ -348,13 +359,7 @@ export const webshot = async (
 
     const webpageImageData = webpageImage.toString("base64");
 
-    const browserFrameSvg = options.darkMode
-      ? frameMacDark(hostname)
-      : frameMacLight(hostname);
-
-    newPage.setContent(browserFrameSvg);
-
-    // set webpage image in div after frame div
+    newPage.setContent(browserFrameSvg.frame(hostname, title));
 
     await newPage.addStyleTag({
       content: `
@@ -367,18 +372,12 @@ export const webshot = async (
 
     newPage.evaluate(
       ({ webpageImageData, originalHeight }) => {
-        // add image webpage in img
-
         const img = document.createElement("img");
-
-        // convert buffer to base64 anf set the src
 
         img.src = `data:image/png;base64,${webpageImageData}`;
 
         img.style.width = "100%";
         img.style.height = originalHeight + "px";
-
-        // add bottom border radius to the image
 
         img.style.borderBottomLeftRadius = "10px";
         img.style.borderBottomRightRadius = "10px";

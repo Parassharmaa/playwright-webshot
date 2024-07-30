@@ -119,7 +119,7 @@ test("Paint Webshot", async ({ page }) => {
     ],
     {
       path: "test/screenshot.png",
-      showBrowserFrame: true,
+      showBrowserFrame: false,
       darkMode: false,
     }
   );

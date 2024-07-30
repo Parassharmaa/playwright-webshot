@@ -2,6 +2,8 @@ import {
   type PageScreenshotOptions,
   type Locator,
   type Page,
+  chromium,
+  expect,
 } from "@playwright/test";
 import { URL } from "url";
 import frameMacDark from "./frames/frameMacDark";
@@ -219,23 +221,27 @@ export const webshot = async (
 
               textElement.style.background = arrow.textBgColor || "transparent";
 
-              textElement.style.padding = "2px";
+              textElement.style.padding = "4px";
 
               textElement.style.lineHeight = "1";
 
               const textRect = textElement.getBoundingClientRect();
 
+              const defaultTextOffset = 10;
+
               switch (arrow.direction) {
                 case "left":
                   textElement.style.left = `${
-                    arrowRect.left - textRect.width
+                    arrowRect.left - textRect.width - defaultTextOffset
                   }px`;
                   textElement.style.top = `${
                     arrowRect.top - textRect.height / 2
                   }px`;
                   break;
                 case "right":
-                  textElement.style.left = `${arrowRect.right}px`;
+                  textElement.style.left = `${
+                    arrowRect.right + defaultTextOffset
+                  }px`;
                   textElement.style.top = `${
                     arrowRect.top - textRect.height / 2
                   }px`;
@@ -245,7 +251,7 @@ export const webshot = async (
                     arrowRect.left - textRect.width / 2
                   }px`;
                   textElement.style.top = `${
-                    arrowRect.top - textRect.height
+                    arrowRect.top - textRect.height - defaultTextOffset
                   }px`;
                   break;
 
@@ -253,7 +259,9 @@ export const webshot = async (
                   textElement.style.left = `${
                     arrowRect.left - textRect.width / 2
                   }px`;
-                  textElement.style.top = `${arrowRect.bottom}px`;
+                  textElement.style.top = `${
+                    arrowRect.bottom + defaultTextOffset
+                  }px`;
                   break;
               }
             }
@@ -318,6 +326,78 @@ export const webshot = async (
       }
     })
   );
+  if (options?.showBrowserFrame) {
+    const browser = await chromium.launch();
+    // create new playwright context
+
+    const hostname = new URL(page.url()).hostname;
+
+    const context = await browser.newContext();
+
+    const newPage = await context.newPage();
+
+    const originalHeight = page.viewportSize()?.height || 720;
+    const originalWidth = page.viewportSize()?.width || 1280;
+    const frameOffset = 53;
+    await newPage.setViewportSize({
+      width: originalWidth,
+      height: originalHeight + frameOffset,
+    });
+
+    const webpageImage = await page.screenshot();
+
+    const webpageImageData = webpageImage.toString("base64");
+
+    const browserFrameSvg = options.darkMode
+      ? frameMacDark(hostname)
+      : frameMacLight(hostname);
+
+    newPage.setContent(browserFrameSvg);
+
+    // set webpage image in div after frame div
+
+    await newPage.addStyleTag({
+      content: `
+        body {
+         margin: 0;
+         padding: 0;
+        }
+      `,
+    });
+
+    newPage.evaluate(
+      ({ webpageImageData, originalHeight }) => {
+        // add image webpage in img
+
+        const img = document.createElement("img");
+
+        // convert buffer to base64 anf set the src
+
+        img.src = `data:image/png;base64,${webpageImageData}`;
+
+        img.style.width = "100%";
+        img.style.height = originalHeight + "px";
+
+        // add bottom border radius to the image
+
+        img.style.borderBottomLeftRadius = "10px";
+        img.style.borderBottomRightRadius = "10px";
+
+        document.body.appendChild(img);
+      },
+      { webpageImageData, originalHeight }
+    );
+
+    const screenshot = await newPage.screenshot({
+      type: "png",
+      omitBackground: true,
+      ...options,
+    });
+
+    await browser.close();
+
+    return screenshot;
+  }
 
   return page.screenshot({
     type: "png",

@@ -1,6 +1,6 @@
 export default (url = "www.google.com") =>
-  `<svg width="1280" height="54" viewBox="0 0 1280 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g filter="url(#filter0_di_1196_920)">
+  `<svg width="1280" height="53" viewBox="0 0 1280 53" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_i_1196_920)">
 <path d="M0 10C0 4.47715 4.47715 0 10 0H1270C1275.52 0 1280 4.47715 1280 10V53H0V10Z" fill="white"/>
 <g filter="url(#filter1_i_1196_920)">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M27 32C30.3137 32 33 29.3137 33 26C33 22.6863 30.3137 20 27 20C23.6863 20 21 22.6863 21 26C21 29.3137 23.6863 32 27 32Z" fill="#EE6A5F"/>
@@ -20,18 +20,14 @@ export default (url = "www.google.com") =>
 <path d="M886.283 25.6152C886.43 25.6152 886.541 25.5684 886.623 25.4805L889.037 23.0547C889.143 22.9551 889.184 22.8379 889.184 22.7031C889.184 22.5742 889.131 22.4453 889.037 22.3516L886.623 19.9023C886.541 19.8086 886.424 19.7617 886.283 19.7617C886.02 19.7617 885.82 19.9727 885.82 20.2422C885.82 20.3652 885.867 20.4824 885.949 20.5762L887.514 22.1113C887.18 22.0527 886.84 22.0176 886.5 22.0176C883.629 22.0176 881.32 24.3203 881.32 27.1914C881.32 30.0684 883.629 32.377 886.5 32.377C889.371 32.377 891.674 30.0684 891.674 27.1914C891.674 26.9102 891.475 26.7051 891.188 26.7051C890.912 26.7051 890.73 26.9102 890.73 27.1914C890.73 29.5469 888.85 31.4336 886.5 31.4336C884.15 31.4336 882.264 29.5469 882.264 27.1914C882.264 24.8418 884.15 22.9609 886.5 22.9609C886.945 22.9609 887.355 22.9961 887.707 23.0723L885.955 24.8125C885.867 24.9062 885.82 25.0234 885.82 25.1465C885.82 25.416 886.02 25.6152 886.283 25.6152Z" fill="#797979"/>
 </g>
 <defs>
-<filter id="filter0_di_1196_920" x="0" y="0" width="1280" height="53.5" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<filter id="filter0_i_1196_920" x="0" y="0" width="1280" height="53" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dy="0.5"/>
-<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/>
-<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1196_920"/>
-<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1196_920" result="shape"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
 <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
 <feOffset dy="-0.5"/>
 <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
 <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0"/>
-<feBlend mode="normal" in2="shape" result="effect2_innerShadow_1196_920"/>
+<feBlend mode="normal" in2="shape" result="effect1_innerShadow_1196_920"/>
 </filter>
 <filter id="filter1_i_1196_920" x="21" y="20" width="12" height="12" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
@@ -64,4 +60,5 @@ export default (url = "www.google.com") =>
 <feBlend mode="normal" in2="shape" result="effect1_innerShadow_1196_920"/>
 </filter>
 </defs>
-</svg>`;
+</svg>
+`;

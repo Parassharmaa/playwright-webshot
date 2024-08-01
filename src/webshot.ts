@@ -358,7 +358,7 @@ export const webshot = async (
     page: page,
     options: options,
     retake: async function () {
-      return captureShot(this.page, this.options);
+      return captureShot(this.page, { ...this.options, path: undefined });
     },
     reset: async function () {
       await Promise.all(

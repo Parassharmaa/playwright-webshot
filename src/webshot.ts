@@ -53,6 +53,10 @@ export interface PaintConfig {
   text?: TextConfig;
 }
 
+interface Relic extends PaintConfig {
+  id: string;
+}
+
 const addArrowCss = (color: string) => {
   // generate random class name
   const className = `arrow-${Math.random().toString(36).substring(7)}`;
@@ -86,9 +90,13 @@ export const webshot = async (
   configs: PaintConfig[],
   options?: WebshotOptions
 ) => {
+  const allRelics: Relic[] = [];
   await Promise.all(
     configs.map(async (paintConfig) => {
       const { locator } = paintConfig;
+
+      const locatorId = `s${Math.random().toString(36).substring(7)}`;
+
       if (!locator) {
         throw new Error(
           `Could not find element with selector: ${paintConfig.locator}`
@@ -98,9 +106,11 @@ export const webshot = async (
 
       if (paintConfig.type === "box") {
         await locator.evaluate(
-          (element, { box }) => {
+          (element, { box, locatorId }) => {
             const elemRect = element.getBoundingClientRect();
             const boxElement = document.createElement("div");
+
+            boxElement.id = locatorId;
 
             const padding = box?.padding || 0;
 
@@ -126,7 +136,7 @@ export const webshot = async (
             element.style.position = "relative";
             element.appendChild(boxElement);
           },
-          { box }
+          { box, locatorId }
         );
       }
 
@@ -139,8 +149,10 @@ export const webshot = async (
           content: css,
         });
         await locator.evaluate(
-          (element, { arrow, className }) => {
+          (element, { arrow, className, locatorId }) => {
             const arrowElement = document.createElement("div");
+
+            arrowElement.id = locatorId;
 
             arrowElement.classList.add(className);
 
@@ -204,6 +216,9 @@ export const webshot = async (
             if (arrow.text) {
               // calculate text position using getBoundingClientRect of arrow
               const textElement = document.createElement("div");
+
+              textElement.id = `${locatorId}-text`;
+
               const arrowRect = arrowElement.getBoundingClientRect();
 
               textElement.style.position = "fixed";
@@ -265,7 +280,7 @@ export const webshot = async (
               }
             }
           },
-          { arrow, className }
+          { arrow, className, locatorId }
         );
       }
 
@@ -274,8 +289,10 @@ export const webshot = async (
           throw new Error("Mask config is required");
         }
         await locator.evaluate(
-          (element, { mask }) => {
+          (element, { mask, locatorId }) => {
             const maskElement = document.createElement("div");
+
+            maskElement.id = locatorId;
             maskElement.style.position = "absolute";
             maskElement.style.top = "0";
             maskElement.style.left = "0";
@@ -288,7 +305,7 @@ export const webshot = async (
             element.style.position = "relative";
             element.appendChild(maskElement);
           },
-          { mask: paintConfig.mask }
+          { mask: paintConfig.mask, locatorId }
         );
       }
 
@@ -297,8 +314,10 @@ export const webshot = async (
           throw new Error("Text config is required");
         }
         await locator.evaluate(
-          (element, { text }) => {
+          (element, { text, locatorId }) => {
             const textElement = document.createElement("div");
+
+            textElement.id = locatorId;
             textElement.style.position = "fixed";
             textElement.style.top = text.top || "none";
             textElement.style.left = text.left || "none";
@@ -320,11 +339,55 @@ export const webshot = async (
             // append text element to the body
             document.body.appendChild(textElement);
           },
-          { text: paintConfig.text }
+          { text: paintConfig.text, locatorId }
         );
       }
+
+      allRelics.push({
+        id: locatorId,
+        ...paintConfig,
+      });
     })
   );
+
+  let screenshot = await captureShot(page, options);
+
+  return {
+    screenshot,
+    relics: allRelics,
+    page: page,
+    options: options,
+    retake: async function () {
+      return captureShot(this.page, this.options);
+    },
+    reset: async function () {
+      await Promise.all(
+        this.relics.map(async (relic) => {
+          await this.page.evaluate(
+            ({ relicId, type }) => {
+              const element = document.getElementById(relicId);
+
+              if (element) {
+                element.remove();
+              }
+
+              if (type === "arrow") {
+                const textElement = document.getElementById(`${relicId}-text`);
+
+                if (textElement) {
+                  textElement.remove();
+                }
+              }
+            },
+            { relicId: relic.id, type: relic.type }
+          );
+        })
+      );
+    },
+  };
+};
+
+const captureShot = async (page: Page, options?: WebshotOptions) => {
   if (options?.showBrowserFrame) {
     const browser = await chromium.launch();
     // create new playwright context
@@ -396,10 +459,10 @@ export const webshot = async (
     await browser.close();
 
     return screenshot;
+  } else {
+    return page.screenshot({
+      type: "png",
+      ...options,
+    });
   }
-
-  return page.screenshot({
-    type: "png",
-    ...options,
-  });
 };

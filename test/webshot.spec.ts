@@ -5,7 +5,7 @@ test("Paint Webshot", async ({ page }) => {
   await page.goto("https://playwright.dev");
 
   const locator = page.getByText(/started/i).first();
-  const screenshot = await webshot(
+  const shot = await webshot(
     page,
     [
       {
@@ -125,7 +125,13 @@ test("Paint Webshot", async ({ page }) => {
     }
   );
 
-  expect(screenshot).toMatchSnapshot();
+  await shot.reset();
+
+  const removedRelics = await shot.retake();
+
+  expect(shot.screenshot).toMatchSnapshot();
+
+  expect(removedRelics).toMatchSnapshot();
 
   expect(await page.content()).toMatchSnapshot({
     name: "content.html",
@@ -133,3 +139,5 @@ test("Paint Webshot", async ({ page }) => {
 
   await page.close();
 });
+
+test("Webshot", async ({ page }) => {});

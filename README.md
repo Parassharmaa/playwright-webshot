@@ -5,7 +5,7 @@ Easily enhance your webpage screenshots with bounding boxes, arrows, blur masks,
 [![npm](https://img.shields.io/npm/v/playwright-webshot.svg)](https://www.npmjs.com/package/playwright-webshot)
 
 
-![](./test/screenshot.png)
+![](./test/webshot.spec.ts-snapshots/Paint-Webshot-1-darwin.png)
 
 ## Installation
 ```bash
